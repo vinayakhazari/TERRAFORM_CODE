@@ -1,0 +1,12 @@
+NSGid = "/subscriptions/13422346-eb93-429e-85d8-3039a19d52da/resourceGroups/BBY-NP-App-Managed-Network-RG-USC-01/providers/Microsoft.Network/networkSecurityGroups/BBY-NP-App-Corp-PaaS-SpringApps-VNET-USC-01-NSG-SpringApps-01"
+rtid = "/subscriptions/13422346-eb93-429e-85d8-3039a19d52da/resourceGroups/BBY-NP-App-Managed-Network-RG-USC-01/providers/Microsoft.Network/routeTables/BBY-NP-App-Corp-PaaS-SpringApps-VNET-USC-01-SRJ-DT-APP-RouteTable-01"
+# vnetname = "BBY-NP-App-Corp-PaaS-SpringApps-VNET-USC-01"
+vnetname = "mytestvnet1"
+# subnetname = "BBY-NP-App-Corp-PaaS-SpringApps-VNET-USC-01-Subnet-SRJ-DT-APP-01"
+subnetname = "mysubnet1254"
+subnetaddressprefix = ["10.0.230.16/28"]
+serviceEndpoints = ["Microsoft.AzureActiveDirectory", "Microsoft.AzureCosmosDB", "Microsoft.ContainerRegistry", "Microsoft.EventHub", "Microsoft.KeyVault", "Microsoft.ServiceBus", "Microsoft.Sql", "Microsoft.Storage", "Microsoft.Web"]
+delegations = []
+privateEndpointNetworkPolicies = "false"
+privateLinkServiceNetworkPolicies = "true"
+rgname= "myrg1254"
