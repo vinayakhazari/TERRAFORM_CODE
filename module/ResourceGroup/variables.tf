@@ -30,7 +30,34 @@ variable "tagMdr" {
   type = string
 }
 
-variable "role_assignment" {
-  description = "ROle assignment"
-  type = any
+variable "guid1" {
+  type = set(string)
+}
+
+variable "guid2" {
+  type = set(string)
+}
+
+variable "guid3" {
+  type = set(string)
+}
+
+variable "contributorprincipalId" {
+  type = string
+}
+
+variable "contributorRoleDefinitionId" {
+  type = string
+}
+
+variable "readerprincipalId" {
+  type = string
+}
+
+variable "readerRoleDefinitionId" {
+  type = string
+}
+
+variable "svcPrnprincipalId" {
+  type = string
 }
