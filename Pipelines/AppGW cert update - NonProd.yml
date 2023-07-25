@@ -1,0 +1,73 @@
+#trigger:
+#- main
+
+name: AppGW certificate deployment
+
+variables:
+  vmImageName: 'vs2017-win2016'
+
+  azureServiceConnection: 'NP-PaaS-subscription'
+  #azureServiceConnection: 'PD-PaaS-subscription'
+
+ # resourceGroupName: 'BBY-PD-Y5G-BOT-RG-USC-01'
+ # location: 'centralus'
+
+pool:
+  name: Azure Platform-Cloud
+  demands:
+   - agent.name -equals DTW98ETSBS003_AzurePlat_Agent1
+
+#pool:
+ # name: Azure Platform
+  #demands:
+   #- agent.name -equals DTW01ETSBS05C_AZPlatform_Agent6
+
+#pool:
+#  vmImage: $(vmImageName)
+  
+
+steps:
+# pass the appgw name in the inline script
+
+    # ObjectId "d80e19f6-8297-4b6a-aa3b-4b8c9112de71" = NP PaaS Service Principal
+    # ObjectId "030c3c3b-25e4-4c41-9719-29328e5401dd" = NP-PaaS-Network managed identity
+
+   # ObjectId "3475c30c-1ab1-4cdf-8799-07b8a7a6bcef" = PD PaaS Service Principal
+    # ObjectId "868eaf1e-bd8a-4d98-8aaa-32b2f1b163ed" = PD-PaaS-Network managed identity
+
+- task: AzurePowerShell@5
+  displayName: "Set Key Vault Access Policy for Service Connection and Managed Identity"
+  inputs:
+    azureSubscription: '$(azureServiceConnection)'
+    ScriptType: 'InlineScript'
+    Inline: |
+      Set-AzKeyVaultAccessPolicy -VaultName ${env:KEYVAULTNAME} -ObjectId "d80e19f6-8297-4b6a-aa3b-4b8c9112de71" -PermissionsToSecrets get,list -PermissionsToCertificates get,list -BypassObjectIdValidation
+      Set-AzKeyVaultAccessPolicy -VaultName ${env:KEYVAULTNAME} -ObjectId "030c3c3b-25e4-4c41-9719-29328e5401dd" -PermissionsToSecrets get,list -PermissionsToCertificates get,list -BypassObjectIdValidation
+    azurePowerShellVersion: 'LatestVersion'
+    pwsh: true
+
+- task: AzurePowerShell@5
+  displayName: "Load certificate into App Gateway"
+  inputs:
+    azureSubscription: '$(azureServiceConnection)'
+    ScriptType: 'InlineScript'
+    Inline: |
+      $appgw = Get-AzApplicationGateway -Name "${env:APPGWNAME}"
+      $secret = Get-AzKeyVaultCertificate -VaultName ${env:KEYVAULTNAME} -Name "${env:CERTIFICATENAME}"
+      $secretId = $secret.SecretId.Replace($secret.Version, "")
+      Add-AzApplicationGatewaySslCertificate -ApplicationGateway $AppGW -Name "${env:INSERTCERTNAME}" -KeyVaultSecretId $secretId
+      Set-AzApplicationGateway -ApplicationGateway $appgw
+    azurePowerShellVersion: 'LatestVersion'
+    pwsh: true
+
+- task: AzurePowerShell@5
+  displayName: "Remove Access Policy for Service Connection"
+  inputs:
+    azureSubscription: '$(azureServiceConnection)'
+    ScriptType: 'InlineScript'
+    # ObjectId "d80e19f6-8297-4b6a-aa3b-4b8c9112de71" = NP Paas Service Principal
+    # ObjectId "3475c30c-1ab1-4cdf-8799-07b8a7a6bcef" = PD PaaS Service Principal
+    Inline: |
+      Remove-AzKeyVaultAccessPolicy -VaultName ${env:KEYVAULTNAME} -ObjectID "d80e19f6-8297-4b6a-aa3b-4b8c9112de71" 
+    azurePowerShellVersion: 'LatestVersion'
+    pwsh: true

@@ -1,0 +1,1 @@
+az deployment sub validate --name $(ResourceGroup) --location $(location) -f $(System.DefaultWorkingDirectory)/_BBY-AzureProvisioning/ResourceGroup/newrg.bicep --parameters @$(System.DefaultWorkingDirectory)/_BBY-AzureProvisioning/ResourceGroup/SandBox/$(MDRcode)-LB-ResourceGroup.parameters.json
